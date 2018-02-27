@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import pickle
 
@@ -7,7 +6,7 @@ import numpy as np
 import spacy
 
 
-def get_labels(fname):
+def get_samples(fname, parent):
     maxlength = 120
     en_nlp = spacy.load("en_core_web_sm")
     y = []
@@ -26,7 +25,10 @@ def get_labels(fname):
             l2 = en_nlp(line2.decode("utf-8"))
 
             for word in l2:
-                sample.append(ft_model.get_word_vector(word.text))
+                features = ft_model.get_word_vector(word.text)
+                if parent:
+                    features = np.concatenate(features, ft_model.get_word_vector(word.head.text))
+                sample.append(features)
                 if "GO" == word.text:
                     sample_label.append(np.array([0.0, 0.0, 1.0]))
                 elif word.lemma_ in l1:
@@ -49,9 +51,12 @@ def get_labels(fname):
 
 if __name__ == '__main__':
     fname = "gossip"
+    parents = False
+
     if "nt" == os.name:
         path = "E:/Martin/PyCharm Projects/Summarization/"
     else:
         path = "/home/matulma4/summarization/"
-    X, y = get_labels(fname)
-    pickle.dump((X, y), open(path + "model_output/" + fname + "_samples.pickle", "wb"))
+
+    X, y = get_samples(fname, parents)
+    pickle.dump((X, y), open(path + "model_output/samples/" + fname + "_samples.pickle", "wb"))

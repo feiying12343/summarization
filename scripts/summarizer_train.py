@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import pickle
 
@@ -20,12 +19,11 @@ def train_model(trainX, trainY):
     sgd = SGD(lr=2)
     model.compile(loss='categorical_crossentropy', optimizer=sgd)
     print(model.summary())
-    model.fit(trainX, trainY, epochs=10, batch_size=1, verbose=2)
+    model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
     model.save(path + "models/" + fname + ".model")
 
 
 if __name__ == '__main__':
-    input_dim = 256
     timesteps = 239
     output_dim = 3
     output_len = 120
@@ -34,5 +32,6 @@ if __name__ == '__main__':
         path = "E:/Martin/PyCharm Projects/Summarization/"
     else:
         path = "/home/matulma4/summarization/"
-    X, y = pickle.load(open(path + "model_output/" + fname + "_samples.pickle", "rb"))
+    X, y = pickle.load(open(path + "model_output/samples/" + fname + "_samples.pickle", "rb"))
+    input_dim = X.shape[1]
     train_model(X, y)
